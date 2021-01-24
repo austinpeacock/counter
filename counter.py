@@ -98,7 +98,7 @@ def shiftout(byte, color):
     return True
 
 
-def load(iterations, _type):
+def load(iterations, _type, reset):
     """
     Load animations for start up and reset
     """
@@ -106,6 +106,12 @@ def load(iterations, _type):
     global b_counter
     global c_counter
     global d_counter
+
+    global a_dig_state
+    global b_dig_state
+    global c_dig_state
+    global d_dig_state
+
 
     patterns = {
             "circle":[2,4,8,16,64,128],
@@ -120,11 +126,16 @@ def load(iterations, _type):
             shiftout(int(item), c_counter) 
             shiftout(int(item), d_counter)
             sleep(.1)
-    shiftout(digits["off"], a_counter)    
-    shiftout(digits["off"], b_counter)    
-    shiftout(digits["off"], c_counter)    
-    shiftout(digits["off"], d_counter)    
- 
+    if reset:
+        shiftout(digits["off"], a_counter)    
+        shiftout(digits["off"], b_counter)    
+        shiftout(digits["off"], c_counter)    
+        shiftout(digits["off"], d_counter)    
+    else:
+        shiftout(digits[str(a_dig_state)], a_counter)    
+        shiftout(digits[str(b_dig_state)], b_counter)    
+        shiftout(digits[str(c_dig_state)], c_counter)    
+        shiftout(digits[str(d_dig_state)], d_counter)    
     return
 
 
@@ -132,17 +143,42 @@ def sound_up():
     """
     Play the up sound 
     """
-    command = ["aplay", "Kaos_L12_up3.wav"]
+    command = ["aplay", "./Sounds/Kaos_L12_up3.wav"]
     subprocess.Popen(command)
 
     return
 
 def sound_start():
 
-    command = ["aplay", "Startup3.wav"]
+    command = ["aplay", "./Sounds/Startup3.wav"]
     subprocess.Popen(command)
-    load(10,"circle")
-    load(6, "loop")
+    load(10,"circle", True)
+    load(6, "loop", True)
+    
+    return
+
+
+def sound_5():
+
+    command = ["aplay", "./Sounds/Yeah.wav"]
+    subprocess.Popen(command)
+    
+    return
+
+
+def sound_10():
+
+    command = ["aplay", "./Sounds/Almost.wav"]
+    subprocess.Popen(command)
+    
+    return
+
+
+def sound_win():
+
+    command = ["aplay", "./Sounds/Win1.wav"]
+    subprocess.Popen(command)
+    load(6, "loop",False)
     
     return
 
@@ -157,6 +193,18 @@ def a_counter_callback():
     if a_dig_state >= 15:
         print "A Counter F reached"
         return
+    elif a_dig_state == 14:
+        a_dig_state += 1
+        sound_win()
+        shiftout(digits[str(a_dig_state)], a_counter)
+    elif a_dig_state == 4:
+        a_dig_state += 1
+        sound_5()
+        shiftout(digits[str(a_dig_state)], a_counter)
+    elif a_dig_state == 9:
+        a_dig_state += 1
+        sound_10()
+        shiftout(digits[str(a_dig_state)], a_counter)
     else:
         a_dig_state += 1
         sound_up()
@@ -176,10 +224,22 @@ def b_counter_callback():
     if b_dig_state >= 15:
         print "B Counter F reached"
         return
+    elif b_dig_state == 14:
+        b_dig_state += 1
+        sound_win()
+        shiftout(digits[str(b_dig_state)], b_counter)
+    elif b_dig_state == 4:
+        b_dig_state += 1
+        sound_5()
+        shiftout(digits[str(b_dig_state)], b_counter)
+    elif b_dig_state == 9:
+        b_dig_state += 1
+        sound_10()
+        shiftout(digits[str(b_dig_state)], b_counter)
     else:
         b_dig_state += 1
         sound_up()
-        print "B: %s"%(b_dig_state)
+        print "B: %s "%(b_dig_state)
         shiftout(digits[str(b_dig_state)], b_counter)
 
     return
@@ -195,10 +255,22 @@ def c_counter_callback():
     if c_dig_state >= 15:
         print "C Counter F reached"
         return
+    elif c_dig_state == 14:
+        c_dig_state += 1
+        sound_win()
+        shiftout(digits[str(c_dig_state)], c_counter)
+    elif c_dig_state == 4:
+        c_dig_state += 1
+        sound_5()
+        shiftout(digits[str(c_dig_state)], c_counter)
+    elif c_dig_state == 9:
+        c_dig_state += 1
+        sound_10()
+        shiftout(digits[str(c_dig_state)], c_counter)
     else:
         c_dig_state += 1
         sound_up()
-        print "C: %s" %(c_dig_state)
+        print "C: %s "%(c_dig_state)
         shiftout(digits[str(c_dig_state)], c_counter)
 
     return
@@ -214,10 +286,22 @@ def d_counter_callback():
     if d_dig_state >= 15:
         print "D Counter F reached"
         return
+    elif d_dig_state == 14:
+        d_dig_state += 1
+        sound_win()
+        shiftout(digits[str(d_dig_state)], d_counter)
+    elif d_dig_state == 4:
+        d_dig_state += 1
+        sound_5()
+        shiftout(digits[str(d_dig_state)], d_counter)
+    elif d_dig_state == 9:
+        d_dig_state += 1
+        sound_10()
+        shiftout(digits[str(d_dig_state)], d_counter)
     else:
         d_dig_state += 1
         sound_up()
-        print "D: %s" %(d_dig_state)
+        print "D: %s "%(d_dig_state)
         shiftout(digits[str(d_dig_state)], d_counter)
 
     return
@@ -290,18 +374,3 @@ if __name__ == "__main__":
             counter_reset()
             sleep(.5)
         
-
-"""
-        x =raw_input(">> ")
-        
-        if not x.strip():
-            pass 
-        elif x.strip() == "circle":
-            circle_load(10)
-        elif x.strip() == "loop":
-            loop_load(10)
-        else:
-            shiftout(digits[x])
-        sleep(.1)
-
-"""
